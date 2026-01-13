@@ -7,17 +7,14 @@ const protect = async (req, res, next) => {
   // Check for token in cookies first (preferred)
   if (req.cookies.token) {
     token = req.cookies.token;
-    console.log("✅ Token from cookie");
   }
   // Fallback to Authorization header (for cross-origin issues)
   else if (req.headers.authorization?.startsWith("Bearer ")) {
     token = req.headers.authorization.split(" ")[1];
-    console.log("✅ Token from Authorization header");
   }
 
   // Make sure token exists
   if (!token) {
-    console.log("❌ No token provided");
     return res.status(401).json({
       success: false,
       message: "Not authorized to access this route",
@@ -40,7 +37,6 @@ const protect = async (req, res, next) => {
 
     next();
   } catch (error) {
-    console.log("❌ Token verification failed:", error.message);
     return res.status(401).json({
       success: false,
       message: "Not authorized to access this route",

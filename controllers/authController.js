@@ -24,14 +24,6 @@ const sendTokenResponse = (user, statusCode, res) => {
     path: "/", // Ensure cookie is sent with all requests
   };
 
-  // Log cookie settings for debugging
-  console.log("🍪 Setting cookie with options:", {
-    secure: options.secure,
-    sameSite: options.sameSite,
-    httpOnly: options.httpOnly,
-    nodeEnv: process.env.NODE_ENV,
-  });
-
   res
     .status(statusCode)
     .cookie("token", token, options)

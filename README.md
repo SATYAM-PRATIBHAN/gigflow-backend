@@ -14,12 +14,13 @@ RESTful API backend for the GigFlow freelance marketplace platform built with No
 
 ## 📋 Features
 
-- 🔐 JWT authentication with HttpOnly cookies
+- 🔐 JWT authentication with HttpOnly cookies + Authorization header fallback
 - 💼 Complete CRUD operations for gigs and bids
-- ⚡ Real-time notifications using Socket.io
+- ⚡ Real-time notifications and bid status updates using Socket.io
 - 🔒 Atomic transactions for hiring process
 - 🛡️ Protected routes with middleware
 - 🔍 Search functionality
+- 🌐 CORS configured for cross-origin requests
 - ⚠️ Error handling middleware
 
 ## 🛠️ Local Development Setup
@@ -87,6 +88,8 @@ RESTful API backend for the GigFlow freelance marketplace platform built with No
    JWT_EXPIRE=7d
    NODE_ENV=development
    CLIENT_URL=http://localhost:5173
+   # For production, add deployed frontend URL (comma-separated):
+   # CLIENT_URL=http://localhost:5173,https://your-app.vercel.app
    ```
 
 6. **Start development server**:
@@ -264,8 +267,10 @@ backend/
 ## 🔐 Security Features
 
 - **Password Hashing**: bcryptjs with salt rounds
-- **JWT Tokens**: Stored in HttpOnly cookies
-- **CORS**: Configured for specific frontend URL
+- **JWT Tokens**: Dual authentication method
+  - HttpOnly cookies (preferred, more secure)
+  - Authorization header (fallback for cross-origin)
+- **CORS**: Configured for specific frontend URLs (supports multiple origins)
 - **Input Validation**: Mongoose schema validation
 - **Error Handling**: Custom error handler middleware
 
@@ -295,14 +300,14 @@ Socket.io implementation:
 
 ## 🔧 Environment Variables
 
-| Variable     | Description                       | Example                             |
-| ------------ | --------------------------------- | ----------------------------------- |
-| `PORT`       | Server port                       | `5000`                              |
-| `MONGO_URI`  | MongoDB connection string         | `mongodb://localhost:27017/gigflow` |
-| `JWT_SECRET` | Secret key for JWT (min 32 chars) | `your_secret_key`                   |
-| `JWT_EXPIRE` | JWT expiration time               | `7d`                                |
-| `NODE_ENV`   | Environment                       | `development` or `production`       |
-| `CLIENT_URL` | Frontend URL for CORS             | `http://localhost:5173`             |
+| Variable     | Description                              | Example                                             |
+| ------------ | ---------------------------------------- | --------------------------------------------------- |
+| `PORT`       | Server port                              | `5000`                                              |
+| `MONGO_URI`  | MongoDB connection string                | `mongodb://localhost:27017/gigflow`                 |
+| `JWT_SECRET` | Secret key for JWT (min 32 chars)        | `your_secret_key`                                   |
+| `JWT_EXPIRE` | JWT expiration time                      | `7d`                                                |
+| `NODE_ENV`   | Environment                              | `development` or `production`                       |
+| `CLIENT_URL` | Frontend URLs for CORS (comma-separated) | `http://localhost:5173,https://your-app.vercel.app` |
 
 ## ⚠️ Important Notes
 

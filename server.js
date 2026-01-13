@@ -12,6 +12,7 @@ const setupSocketIO = require("./socket/socketHandler");
 connectDB();
 
 const app = express();
+app.use(cors());
 const server = http.createServer(app);
 
 // Initialize Socket.io with CORS

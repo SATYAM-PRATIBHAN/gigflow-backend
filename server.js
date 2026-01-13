@@ -12,14 +12,60 @@ const setupSocketIO = require("./socket/socketHandler");
 connectDB();
 
 const app = express();
-app.use(cors());
 const server = http.createServer(app);
+
+// CORS configuration - supports multiple origins
+const allowedOrigins = process.env.CLIENT_URL
+  ? process.env.CLIENT_URL.split(",").map((url) => url.trim())
+  : ["http://localhost:5173"];
+
+console.log("🌐 Allowed CORS origins:", allowedOrigins);
+
+const corsOptions = {
+  origin: function (origin, callback) {
+    // Allow requests with no origin (Postman, mobile apps, curl)
+    if (!origin) {
+      console.log("✅ Request with no origin allowed");
+      return callback(null, true);
+    }
+
+    if (allowedOrigins.indexOf(origin) !== -1 || allowedOrigins.includes("*")) {
+      console.log("✅ CORS allowed for origin:", origin);
+      callback(null, true);
+    } else {
+      console.log("❌ CORS blocked origin:", origin);
+      callback(new Error(`Origin ${origin} not allowed by CORS`));
+    }
+  },
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
+  allowedHeaders: [
+    "Content-Type",
+    "Authorization",
+    "Cookie",
+    "X-Requested-With",
+  ],
+  exposedHeaders: ["Set-Cookie"],
+  preflightContinue: false,
+  optionsSuccessStatus: 204,
+};
 
 // Initialize Socket.io with CORS
 const io = new Server(server, {
   cors: {
-    origin: process.env.CLIENT_URL || "http://localhost:5173",
+    origin: function (origin, callback) {
+      if (!origin) return callback(null, true);
+      if (
+        allowedOrigins.indexOf(origin) !== -1 ||
+        allowedOrigins.includes("*")
+      ) {
+        callback(null, true);
+      } else {
+        callback(new Error("Socket.io: Origin not allowed by CORS"));
+      }
+    },
     credentials: true,
+    methods: ["GET", "POST"],
   },
 });
 
@@ -31,12 +77,7 @@ app.set("io", io);
 app.set("userSockets", userSockets);
 
 // Middleware
-app.use(
-  cors({
-    origin: process.env.CLIENT_URL || "http://localhost:5173",
-    credentials: true,
-  })
-);
+app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());

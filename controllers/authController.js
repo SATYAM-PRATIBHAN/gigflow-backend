@@ -21,7 +21,16 @@ const sendTokenResponse = (user, statusCode, res) => {
     httpOnly: true,
     secure: isProduction, // HTTPS in production
     sameSite: isProduction ? "none" : "lax", // 'none' for cross-origin in production
+    path: "/", // Ensure cookie is sent with all requests
   };
+
+  // Log cookie settings for debugging
+  console.log("🍪 Setting cookie with options:", {
+    secure: options.secure,
+    sameSite: options.sameSite,
+    httpOnly: options.httpOnly,
+    nodeEnv: process.env.NODE_ENV,
+  });
 
   res
     .status(statusCode)

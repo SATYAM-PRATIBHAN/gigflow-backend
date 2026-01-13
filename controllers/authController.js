@@ -12,13 +12,15 @@ const generateToken = (id) => {
 const sendTokenResponse = (user, statusCode, res) => {
   const token = generateToken(user._id);
 
+  const isProduction = process.env.NODE_ENV === "production";
+
   const options = {
     expires: new Date(
       Date.now() + 7 * 24 * 60 * 60 * 1000 // 7 days
     ),
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production", // HTTPS in production
-    sameSite: "strict",
+    secure: isProduction, // HTTPS in production
+    sameSite: isProduction ? "none" : "lax", // 'none' for cross-origin in production
   };
 
   res
@@ -121,9 +123,13 @@ exports.getMe = async (req, res, next) => {
 // @access  Private
 exports.logout = async (req, res, next) => {
   try {
+    const isProduction = process.env.NODE_ENV === "production";
+
     res.cookie("token", "none", {
       expires: new Date(Date.now() + 10 * 1000),
       httpOnly: true,
+      secure: isProduction,
+      sameSite: isProduction ? "none" : "lax",
     });
 
     res.status(200).json({
